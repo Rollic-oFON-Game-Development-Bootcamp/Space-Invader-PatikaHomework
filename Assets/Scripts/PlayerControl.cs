@@ -5,34 +5,66 @@ using UnityEngine;
 public class PlayerControl : MonoBehaviour
 {
     #region Variables
-    private float touchPosX;
-    [SerializeField] private float swerveSpeed;
-    [SerializeField] private float minXPos;
-    [SerializeField] private float maxXPos;
-    #endregion
-    void Start()
+    [SerializeField] private Transform sideMovementRoot;
+    [SerializeField] private Transform leftLimit;
+    [SerializeField] private Transform rightLimit;
+
+    [SerializeField] private float sideMovementSensitivity;
+    [SerializeField] private float sideMovementLerpSpeed;
+
+
+    private Vector2 inputDrag;
+    private Vector2 previousMousePosition;
+
+    private float leftLimitX => leftLimit.localPosition.x;
+    private float rightLimitX => rightLimit.localPosition.x;
+
+    private float sideMovementTarget = 0;
+    private Vector2 mousePositionCM // Providing the same experience to everyone
     {
+        get
+        {
+            Vector2 pixels = Input.mousePosition;
+            var inches = pixels / Screen.dpi;
+            var centimetres = inches * 2.54f; // 1 inch = 2.54 cm
 
+            return centimetres;
+        }
     }
-
-    // Update is called once per frame
+    #endregion
     void Update()
     {
-        Movement();
+        HandleInput();
+        HandleSideMovement();
     }
-    private void Movement() 
+
+    private void HandleSideMovement()
+    {
+        sideMovementTarget += inputDrag.x * sideMovementSensitivity;
+        sideMovementTarget = Mathf.Clamp(sideMovementTarget, leftLimitX, rightLimitX);
+
+        var localPos = sideMovementRoot.localPosition;
+
+        localPos.x = Mathf.Lerp(localPos.x, sideMovementTarget, Time.deltaTime * sideMovementLerpSpeed);
+
+        sideMovementRoot.localPosition = localPos;
+    }
+
+    private void HandleInput()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            touchPosX += Input.mousePosition.x * swerveSpeed * Time.deltaTime;
-            Debug.Log("asdsad  " + touchPosX);
-            transform.position += new Vector3(touchPosX, transform.position.y, transform.position.z);
+            previousMousePosition = mousePositionCM;
         }
-        transform.position = new Vector3
-                (
-                    Mathf.Clamp(transform.position.x, minXPos, maxXPos),
-                    -4,
-                    0
-                );
+        if (Input.GetMouseButton(0))
+        {
+            var deltaMouse = (Vector2)mousePositionCM - previousMousePosition;
+            inputDrag = deltaMouse;
+            previousMousePosition = mousePositionCM;
+        }
+        else
+        {
+            inputDrag = Vector2.zero;
+        }
     }
 }
