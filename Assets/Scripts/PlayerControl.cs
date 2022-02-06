@@ -12,6 +12,8 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private float sideMovementSensitivity;
     [SerializeField] private float sideMovementLerpSpeed;
 
+    [SerializeField] private Projectile laserPrefab;
+
 
     private Vector2 inputDrag;
     private Vector2 previousMousePosition;
@@ -65,6 +67,12 @@ public class PlayerControl : MonoBehaviour
         else
         {
             inputDrag = Vector2.zero;
+            Shoot();
         }
+    }
+
+    private void Shoot()
+    {
+        Instantiate(laserPrefab, transform.position, Quaternion.identity);
     }
 }

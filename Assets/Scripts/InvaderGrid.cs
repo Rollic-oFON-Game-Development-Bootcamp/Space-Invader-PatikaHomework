@@ -11,23 +11,19 @@ public class InvaderGrid : MonoBehaviour
 
     [SerializeField] private float speed;
 
+    [SerializeField] private Camera mainCamera;
+
     private Vector3 direction = Vector2.right;
     private void Awake()
     {
         CreateGrid();
     }
-
-    private void Update()
-    {
-        InvadersMovement();
-    }
-
     private void CreateGrid()
     {
         for (int i = 0; i < rows; i++)
         {
             float width = 1.3f * (columns - 1);
-            float height = 0.02f* (rows - 1);
+            float height = 0.02f * (rows - 1);
 
             Vector2 centering = new Vector2(-width / 2, height / 2);
 
@@ -40,10 +36,5 @@ public class InvaderGrid : MonoBehaviour
                 invader.transform.position = position;
             }
         }
-    }
-
-    private void InvadersMovement() 
-    {
-        transform.position += direction * Time.deltaTime * speed;
     }
 }
